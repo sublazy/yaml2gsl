@@ -19,3 +19,8 @@ indent_size = 2
 # Space indentation is mandatory for gsl scripts.
 indent_style = space
 tab_width = 4
+
+[*.rb]
+indent_style = space
+tab_width = 2
+indent_size = 2
