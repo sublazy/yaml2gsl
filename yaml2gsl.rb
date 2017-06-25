@@ -95,43 +95,30 @@ class Array
   end
 end
 
-def extract_simple_pairs!(node)
-  ret = Hash.new
-  simple_classes = [String, Integer, Float]
+class Hash
+  def extract_simple_pairs!(node)
+    ret = Hash.new
+    simple_classes = [String, Integer, Float]
 
-  if node.class == Array
-    node.each{|element|
-      #puts "processing: " + element.to_s
-      if element.class == Hash && element.length == 1
-        element = element.to_a[0]
-        key = element[0]
-        val = element[1]
-        if simple_classes.include?(val.class)
-          ret[key] = val
-          node.delete(key)
-        end
+    node.each{|key, value|
+      if simple_classes.include?(value.class)
+        ret[key] = value
+        node.delete(key)
       end
     }
-  end
-
-  node.each{|key, value|
-    if simple_classes.include?(value.class)
-      ret[key] = value
-      node.delete(key)
-    end
-  }
-  return ret
-end
-
-def is_simple_hash(node)
-  if node.class == Hash
+    return ret
   end
 end
 
-def print_attributes(arr)
-  arr.each {|hash|
-    hash.each {|key, val| printf("%s=\"%s\" ", key, val)}
+def xml_attr_str(hash)
+  all = " "
+  # hash.each {|key, val| printf("%s=\"%s\" ", key, val)}
+  hash.each {|key, val|
+    s = "#{key} = \"#{val}\" "
+    all = all + s
   }
+
+  return all.chomp(" ")
 end
 
 def traverse(node, level)
@@ -155,7 +142,8 @@ def traverse_hash(node, level)
       tag_attributes = extract_simple_pairs!(child)
     end
     indent(level)
-    printf "<%s %s>\n", key, tag_attributes.to_s
+    printf "<%s%s>\n", key, xml_attr_str(tag_attributes)
+    #printf "attr: %s\n", print_attributes(tag_attributes)
     #printf "child length after extracting simple pairs: %d\n", child.length
     traverse(child, level+1)
     indent(level)
@@ -174,10 +162,8 @@ model2 = { "name"=>"bat", "hp"=>20, "effects"=>["haste", "curse", "hunger"] }
 model3 = [ { "name"=>"bat" }, {"hp"=>20}, {"effects"=>["haste", "curse", "hunger"]} ]
 model4= Psych.load_file("model1.yml")
 
-model = model4
-model.display
-puts "\n"
-
 level = 0
-traverse(model, level)
+#traverse(model4, level)
+traverse(model4, level); puts "# ======================\n"
+traverse(model1, level); puts "# ======================\n"
 
