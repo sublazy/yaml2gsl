@@ -64,8 +64,8 @@ end
 
 class Array
 
-  def traverse(level = 0)
-    self.each {|element| element.traverse(level) }
+  def to_xml_tree(level = 0)
+    self.each {|element| element.to_xml_tree(level) }
   end
 
   def extract_simple_pairs!
@@ -103,11 +103,11 @@ end
 
 class Hash
 
-  def traverse(level = 0)
+  def to_xml_tree(level = 0)
     self.each{|key, child|
       tag_attributes = child.extract_simple_pairs!
       indent(level); printf "<%s%s>\n", key, xml_attr_str(tag_attributes)
-      child.traverse(level+1)
+      child.to_xml_tree(level+1)
       indent(level); printf "</%s>\n", key
     }
   end
@@ -146,12 +146,14 @@ model1 = { "scene" => [
 model2 = { "name"=>"bat", "hp"=>20, "effects"=>["haste", "curse", "hunger"] }
 model3 = [ { "name"=>"bat" }, {"hp"=>20}, {"effects"=>["haste", "curse", "hunger"]} ]
 model4= Psych.load_file("model1.yml")
+model3= Psych.load_file("model3.yml")
 
 level = 0
-#traverse(model4, level)
+#to_xml_tree(model4, level)
 puts "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
-# traverse(model4, level); puts "# ======================\n"
-# traverse(model1, level); puts "# ======================\n"
+# to_xml_tree(model4, level); puts "# ======================\n"
+# to_xml_tree(model1, level); puts "# ======================\n"
 
-model1.traverse
-model4.traverse
+model3.to_xml_tree
+model1.to_xml_tree
+model4.to_xml_tree
