@@ -1,5 +1,4 @@
-yaml2gsl
-========
+# yaml2gsl
 
 yaml2gsl is a tool that allows writing models for GSL code generator in YAML instead of XML. As such, it is not a general-purpose converter. It accepts only very limited YAML schema, and produces XML according to a schema accepted by GSL.
 
