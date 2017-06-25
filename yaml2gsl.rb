@@ -104,6 +104,7 @@ end
 class Hash
 
   def to_xml_tree(level = 0)
+
     self.each{|key, child|
       tag_attributes = child.extract_simple_pairs!
       indent(level); printf "<%s%s>\n", key, xml_attr_str(tag_attributes)
@@ -138,22 +139,10 @@ end
 
 # Application
 # ------------------------------------------------------------------------------
-model1 = { "scene" => [
-  {"creature"=>[{"name"=>"Bat"}, {"hp"=>"20"}]},
-  {"creature"=>[{"name"=>"Fox"}, {"hp"=>"30"}]},
-  {"creature"=>[{"name"=>"Eel"}, {"hp"=>"40"}]},
-]}
-model2 = { "name"=>"bat", "hp"=>20, "effects"=>["haste", "curse", "hunger"] }
-model3 = [ { "name"=>"bat" }, {"hp"=>20}, {"effects"=>["haste", "curse", "hunger"]} ]
-model4= Psych.load_file("model1.yml")
+model1= Psych.load_file("model1.yml")
+model2= Psych.load_file("model2.yml")
 model3= Psych.load_file("model3.yml")
 
-level = 0
-#to_xml_tree(model4, level)
 puts "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
-# to_xml_tree(model4, level); puts "# ======================\n"
-# to_xml_tree(model1, level); puts "# ======================\n"
 
-model3.to_xml_tree
-model1.to_xml_tree
-model4.to_xml_tree
+model2.to_xml_tree
