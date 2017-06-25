@@ -63,6 +63,11 @@ def has_simple_children?(hash)
 end
 
 class Array
+
+  def traverse(level = 0)
+    self.each {|element| element.traverse(level) }
+  end
+
   def extract_simple_pairs!
     ret = Hash.new
     simple_classes = [String, Integer, Float]
@@ -95,14 +100,25 @@ class Array
   end
 end
 
+
 class Hash
+
+  def traverse(level = 0)
+    self.each{|key, child|
+      tag_attributes = child.extract_simple_pairs!
+      indent(level); printf "<%s%s>\n", key, xml_attr_str(tag_attributes)
+      child.traverse(level+1)
+      indent(level); printf "</%s>\n", key
+    }
+  end
+
   def extract_simple_pairs!(node)
     ret = Hash.new
     simple_classes = [String, Integer, Float]
 
-    node.each{|key, value|
-      if simple_classes.include?(value.class)
-        ret[key] = value
+    node.each{|key, val|
+      if simple_classes.include?(val.class)
+        ret[key] = val
         node.delete(key)
       end
     }
@@ -112,43 +128,12 @@ end
 
 def xml_attr_str(hash)
   all = " "
-  # hash.each {|key, val| printf("%s=\"%s\" ", key, val)}
   hash.each {|key, val|
     s = "#{key} = \"#{val}\" "
     all = all + s
   }
 
   return all.chomp(" ")
-end
-
-def traverse(node, level)
-  # puts "traversing node: " + node.class.to_s + "\n"
-  traverse_array(node, level) if node.class == Array
-  traverse_hash(node, level)  if node.class == Hash
-end
-
-def traverse_array(node, level)
-  node.each {|element| traverse(element, level) }
-end
-
-def traverse_hash(node, level)
-  node.each{|key,child|
-    #printf "# found hash `%s` whose child is an %s\n", key, child.class.to_s
-    #printf "child length before extracting simple pairs: %d\n", child.length
-    tag_attributes = Hash.new()
-    if child.class == Array
-      tag_attributes = child.extract_simple_pairs!
-    else
-      tag_attributes = extract_simple_pairs!(child)
-    end
-    indent(level)
-    printf "<%s%s>\n", key, xml_attr_str(tag_attributes)
-    #printf "attr: %s\n", print_attributes(tag_attributes)
-    #printf "child length after extracting simple pairs: %d\n", child.length
-    traverse(child, level+1)
-    indent(level)
-    printf "</%s>\n", key
-  }
 end
 
 # Application
@@ -164,6 +149,9 @@ model4= Psych.load_file("model1.yml")
 
 level = 0
 #traverse(model4, level)
-traverse(model4, level); puts "# ======================\n"
-traverse(model1, level); puts "# ======================\n"
+puts "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
+# traverse(model4, level); puts "# ======================\n"
+# traverse(model1, level); puts "# ======================\n"
 
+model1.traverse
+model4.traverse
