@@ -127,6 +127,12 @@ class Hash
   end
 end
 
+class String
+  def to_xml_tree(level = 0)
+      indent(level); printf "<%s/>\n", self
+  end
+end
+
 def xml_attr_str(hash)
   all = " "
   hash.each {|key, val|
@@ -145,4 +151,8 @@ model3= Psych.load_file("model3.yml")
 
 puts "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
 
+model3.to_xml_tree
+puts "\n\n"
 model2.to_xml_tree
+puts "\n\n"
+model1.to_xml_tree
