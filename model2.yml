@@ -1,0 +1,12 @@
+scene:
+
+  - creature:
+    - name: Bat
+    - hp: 20
+
+  - creature:
+    - name: Emu
+    - hp: 50
+
+  - creature: [name: snake, hp: 32]
+
