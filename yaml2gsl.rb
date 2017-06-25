@@ -10,39 +10,8 @@ def indent(level)
   (OUT_INDENT_SIZE*level).times {putc ' '}
 end
 
-def simple?(hash)
-  if hash.any? {|key, val| (val.class == Array || val.class == Hash)}
-    #puts "hash is complex"
-    return false
-  else
-    #puts "hash is simple"
-    return true
-  end
-end
-
-def has_complex_children?(hash)
-  if simple?(hash)
-    return false
-  end
-
-  hash.each_value{|sequence|
-    if sequence.class != Array
-      puts "error! We expect only arrays."
-      return true
-    end
-
-    if sequence.any?{|hash| !simple?(hash)}
-      #puts "hash has complex children"
-      return true
-    else
-      #puts "hash can be a one-liner"
-      return false
-    end
-  }
-end
-
 def has_simple_children?(hash)
-  if simple?(hash)
+  if hash.simple?
     return false
   end
 
@@ -52,7 +21,7 @@ def has_simple_children?(hash)
       return true
     end
 
-    if sequence.any?{|hash| simple?(hash)}
+    if sequence.any?{|hash| hash.simple?}
       #puts "hash has simple children"
       return true
     else
@@ -63,6 +32,10 @@ def has_simple_children?(hash)
 end
 
 class Array
+
+  def simple?
+    return false
+  end
 
   def to_xml_tree(level = 0)
     self.each {|element| element.to_xml_tree(level) }
@@ -103,13 +76,27 @@ end
 
 class Hash
 
+  def simple?
+    if self.any? {|key, val| (val.class == Array || val.class == Hash)}
+      return false
+    else
+      return true
+    end
+  end
+
   def to_xml_tree(level = 0)
 
     self.each{|key, child|
       tag_attributes = child.extract_simple_pairs!
-      indent(level); printf "<%s%s>\n", key, xml_attr_str(tag_attributes)
-      child.to_xml_tree(level+1)
-      indent(level); printf "</%s>\n", key
+      formatted_attr = xml_attr_str(tag_attributes)
+
+      if self.has_complex_children?
+        indent(level); printf "<%s%s>\n", key, formatted_attr
+        child.to_xml_tree(level+1)
+        indent(level); printf "</%s>\n", key
+      else
+        indent(level); printf "<%s%s />\n", key, formatted_attr
+      end
     }
   end
 
@@ -125,22 +112,51 @@ class Hash
     }
     return ret
   end
+
+  def has_complex_children?
+    if self.simple?
+      return false
+    end
+    self.each_value{|sequence|
+      #puts "sequence class: #{sequence.class.to_s}"
+      if sequence.class != Array
+        puts "error! We expect only arrays."
+        return true
+      end
+
+      if sequence.any?{|element| !element.simple?}
+        #puts "hash has complex children"
+        return true
+      else
+        #puts "hash can be a one-liner"
+        return false
+      end
+    }
+  end
 end
 
 class String
   def to_xml_tree(level = 0)
       indent(level); printf "<%s/>\n", self
   end
+
+  def simple?
+    return true
+  end
+
+  def has_complex_children?()
+    return false
+  end
 end
 
 def xml_attr_str(hash)
-  all = " "
+  all = ""
   hash.each {|key, val|
-    s = "#{key} = \"#{val}\" "
+    s = " #{key} = \"#{val}\""
     all = all + s
   }
 
-  return all.chomp(" ")
+  return all
 end
 
 # Application
