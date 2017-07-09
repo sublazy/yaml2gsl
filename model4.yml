@@ -1,0 +1,31 @@
+scene:
+
+# Mappings like this should not be allowed. We have a sequence of multiple
+# creatures. So we have to create <creature> tags. But then we have a dangling
+# value "bat", which should become a value of some attribute, but there's no
+# attribute to assign it to.
+#
+# Another problem: this sequence element is a mapping with three key-value
+# pairs. But in mappings the order of elements doesn't matter, so it's not
+# clear which of the keys should become the xml tag name.
+#
+#  - creature: bat
+#    hp: 40
+#    type: flying
+#
+# equivalent form:
+#  - {creature: snake, hp: 32, type: ground}
+
+  - creature: {name: emu, hp: 50}
+
+  - creature:
+      name: emu
+      hp: 50
+      effects:
+        - effect:
+            name: blessing
+            time_left: 12
+        - effect:
+            name: haste
+            time_left: 30
+
