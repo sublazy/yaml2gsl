@@ -100,14 +100,14 @@ class Hash
     }
   end
 
-  def extract_simple_pairs!(node)
+  def extract_simple_pairs!
     ret = Hash.new
     simple_classes = [String, Integer, Float]
 
-    node.each{|key, val|
+    self.each{|key, val|
       if simple_classes.include?(val.class)
         ret[key] = val
-        node.delete(key)
+        self.delete(key)
       end
     }
     return ret
@@ -120,7 +120,7 @@ class Hash
     self.each_value{|sequence|
       #puts "sequence class: #{sequence.class.to_s}"
       if sequence.class != Array
-        puts "error! We expect only arrays."
+        #puts "error! We expect only arrays."
         return true
       end
 
@@ -147,6 +147,32 @@ class String
   def has_complex_children?()
     return false
   end
+
+  def extract_simple_pairs!
+    # puts "extracting simple pairs in string"
+    ret = Hash.new
+    return ret
+  end
+end
+
+class Integer
+  def to_xml_tree(level = 0)
+      indent(level); printf "<%s/>\n", self
+  end
+
+  def simple?
+    return true
+  end
+
+  def has_complex_children?()
+    return false
+  end
+
+  def extract_simple_pairs!
+    # puts "extracting simple pairs in integer"
+    ret = Hash.new
+    return ret
+  end
 end
 
 def xml_attr_str(hash)
@@ -164,9 +190,12 @@ end
 model1= Psych.load_file("model1.yml")
 model2= Psych.load_file("model2.yml")
 model3= Psych.load_file("model3.yml")
+model4= Psych.load_file("model4.yml")
 
 puts "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
 
+model4.to_xml_tree
+puts "\n\n"
 model3.to_xml_tree
 puts "\n\n"
 model2.to_xml_tree
