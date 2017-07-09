@@ -10,6 +10,7 @@ def indent(level)
   (OUT_INDENT_SIZE*level).times {putc ' '}
 end
 
+# TODO Not used anymore. Remove.
 def has_simple_children?(hash)
   if hash.simple?
     return false
@@ -34,10 +35,15 @@ end
 class Array
 
   def simple?
-    return false
+      if self.any?{|element| !element.simple?}
+        return false
+      else
+        return true
+      end
   end
 
   def to_xml_tree(level = 0)
+    # puts "to_xml_tree: array: " + self.to_s
     self.each {|element| element.to_xml_tree(level) }
   end
 
@@ -85,6 +91,7 @@ class Hash
   end
 
   def to_xml_tree(level = 0)
+    # puts "to_xml_tree: hash: " + self.to_s
 
     self.each{|key, child|
       tag_attributes = child.extract_simple_pairs!
@@ -114,24 +121,8 @@ class Hash
   end
 
   def has_complex_children?
-    if self.simple?
-      return false
-    end
-    self.each_value{|sequence|
-      #puts "sequence class: #{sequence.class.to_s}"
-      if sequence.class != Array
-        #puts "error! We expect only arrays."
-        return true
-      end
-
-      if sequence.any?{|element| !element.simple?}
-        #puts "hash has complex children"
-        return true
-      else
-        #puts "hash can be a one-liner"
-        return false
-      end
-    }
+    return false if self.simple?
+    return self.any?{|key, value| !value.simple?}
   end
 end
 
@@ -156,10 +147,6 @@ class String
 end
 
 class Integer
-  def to_xml_tree(level = 0)
-      indent(level); printf "<%s/>\n", self
-  end
-
   def simple?
     return true
   end
