@@ -174,17 +174,11 @@ end
 
 # Application
 # ------------------------------------------------------------------------------
-model1= Psych.load_file("model1.yml")
-model2= Psych.load_file("model2.yml")
-model3= Psych.load_file("model3.yml")
-model4= Psych.load_file("model4.yml")
-
 puts "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
 
-model4.to_xml_tree
-puts "\n\n"
-model3.to_xml_tree
-puts "\n\n"
-model2.to_xml_tree
-puts "\n\n"
-model1.to_xml_tree
+ARGV.each do|file_arg|
+  model = Psych.load_file(file_arg)
+  model.to_xml_tree
+  puts "\n\n"
+end
+
